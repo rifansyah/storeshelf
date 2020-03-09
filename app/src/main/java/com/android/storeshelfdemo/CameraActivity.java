@@ -1,5 +1,6 @@
 package com.android.storeshelfdemo;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -47,6 +49,8 @@ public class CameraActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_camera);
         getSupportActionBar().hide();
+        View view = this.getWindow().getDecorView();
+        view.setBackgroundColor(getResources().getColor(android.R.color.black));
 
         String picture1Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_1.png";
         String picture2Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_2.png";
@@ -62,7 +66,11 @@ public class CameraActivity extends AppCompatActivity {
 
         textureView = findViewById(R.id.view_finder);
         ImageButton imgCapture = findViewById(R.id.imgCapture);
+        ImageButton imgNext = findViewById(R.id.imgNext);
+        Button btnNomor = findViewById(R.id.buttonNomor);
         imgCapture.setRotation(90);
+        imgNext.setRotation(90);
+        btnNomor.setRotation(90);
 
         if(allPermissionsGranted()){
             startCamera(); //start camera if permission has been granted by user
@@ -71,6 +79,19 @@ public class CameraActivity extends AppCompatActivity {
         }
 
         int pictureId = getIntent().getIntExtra("pictureNumber",0);
+        if(pictureId == 1){
+            btnNomor.setText("Foto 1");
+        }else if(pictureId == 2){
+            btnNomor.setText("Foto 2");
+        }else if(pictureId == 3){
+            btnNomor.setText("Foto 3");
+        }else if(pictureId == 4){
+            btnNomor.setText("Foto 4");
+        }else if(pictureId == 5){
+            btnNomor.setText("Foto 5");
+        }else if(pictureId == 6){
+            btnNomor.setText("Foto 6");
+        }
 
 
 //        if(pictureId == 1){
@@ -217,7 +238,7 @@ public class CameraActivity extends AppCompatActivity {
                 imgCap.takePicture(file, new ImageCapture.OnImageSavedListener() {
                     @Override
                     public void onImageSaved(@NonNull File file) {
-                        String msg = "Pic captured at " + file.getAbsolutePath();
+                        String msg = "Gambar " + getIntent().getIntExtra("pictureNumber",0) + " berhasil disimpan";
                         Toast.makeText(getBaseContext(), msg,Toast.LENGTH_LONG).show();
                     }
 
@@ -313,5 +334,42 @@ public class CameraActivity extends AppCompatActivity {
 
     public void back(View view) {
         finish();
+    }
+
+    public void nextImage(View view) {
+        int pictureId = getIntent().getIntExtra("pictureNumber",0);
+        if(pictureId == 1){
+            Intent intent = getIntent();
+            int pictureNumber = 2;
+            intent.putExtra("pictureNumber",pictureNumber);
+            finish();
+            startActivity(intent);
+        }else if(pictureId == 2){
+            Intent intent = getIntent();
+            int pictureNumber = 3;
+            intent.putExtra("pictureNumber",pictureNumber);
+            finish();
+            startActivity(intent);
+        }else if(pictureId == 3){
+            Intent intent = getIntent();
+            int pictureNumber = 4;
+            intent.putExtra("pictureNumber",pictureNumber);
+            finish();
+            startActivity(intent);
+        }else if(pictureId == 4){
+            Intent intent = getIntent();
+            int pictureNumber = 5;
+            intent.putExtra("pictureNumber",pictureNumber);
+            finish();
+            startActivity(intent);
+        }else if(pictureId == 5){
+            Intent intent = getIntent();
+            int pictureNumber = 6;
+            intent.putExtra("pictureNumber",pictureNumber);
+            finish();
+            startActivity(intent);
+        }else if(pictureId == 6){
+            finish();
+        }
     }
 }

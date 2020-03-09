@@ -83,9 +83,31 @@
         android:id="@+id/imgCapture"
         android:layout_width="72dp"
         android:layout_height="72dp"
-        android:layout_margin="24dp"
+        android:layout_marginStart="174dp"
+        android:layout_marginBottom="32dp"
         android:src="@drawable/ic_photo_camera_black_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/imgNext"
+        app:layout_constraintStart_toStartOf="@+id/view_finder" />
+
+    <ImageButton
+        android:id="@+id/imgNext"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/ic_arrow_forward_black_24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:onClick="nextImage"/>
+
+    <Button
+        android:id="@+id/buttonNomor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Foto 1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
