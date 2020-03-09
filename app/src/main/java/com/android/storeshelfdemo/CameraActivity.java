@@ -1,4 +1,4 @@
-package com.android.storeshelf;
+package com.android.storeshelfdemo;
 
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -12,6 +12,9 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -39,8 +42,18 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_camera);
         getSupportActionBar().hide();
+
+        String picture1Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_1.png";
+        String picture2Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_2.png";
+        String picture3Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_3.png";
+        String picture4Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_4.png";
+        String picture5Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_5.png";
+        String picture6Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_6.png";
 
         ImageView imgPreviewLeft = findViewById(R.id.imagePreviewLeft);
         ImageView imgPreviewRight = findViewById(R.id.imagePreviewRight);
@@ -48,6 +61,8 @@ public class CameraActivity extends AppCompatActivity {
         ImageView imgPreviewBottom = findViewById(R.id.imagePreviewBottom);
 
         textureView = findViewById(R.id.view_finder);
+        ImageButton imgCapture = findViewById(R.id.imgCapture);
+        imgCapture.setRotation(90);
 
         if(allPermissionsGranted()){
             startCamera(); //start camera if permission has been granted by user
@@ -58,46 +73,93 @@ public class CameraActivity extends AppCompatActivity {
         int pictureId = getIntent().getIntExtra("pictureNumber",0);
 
 
-        if(pictureId == 1){
-            File imgFileRight = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_2.png");
-            Bitmap imgRight = BitmapFactory.decodeFile(imgFileRight.getAbsolutePath());
-
-//            imgPreviewRight.imageMatrix = Matrix.ScaleToFit.START;
-
-            imgPreviewRight.setImageBitmap(imgRight);
-
-            imgPreviewRight.setRotation(90);
-        }else if(pictureId == 2){
-            File imgFileLeft = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_1.png");
-            Bitmap imgLeft = BitmapFactory.decodeFile(imgFileLeft.getAbsolutePath());
-            File imgFileRight = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_3.png");
-            Bitmap imgRight = BitmapFactory.decodeFile(imgFileRight.getAbsolutePath());
-
-//            imgPreviewLeft.imageMatrix = Matrix.ScaleToFit.END;
-//            imgPreviewRight.imageMatrix = Matrix.ScaleToFit.START;
-
-            imgPreviewLeft.setImageBitmap(imgLeft);
-            imgPreviewLeft.setRotation(90);
-            imgPreviewRight.setImageBitmap(imgRight);
-            imgPreviewRight.setRotation(90);
-        }else if(pictureId == 3){
-            File imgFileLeft = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_2.png");
-            Bitmap imgLeft = BitmapFactory.decodeFile(imgFileLeft.getAbsolutePath());
-
-//            imgPreviewLeft.imageMatrix = Matrix.ScaleToFit.END;
-
-            imgPreviewLeft.setImageBitmap(imgLeft);
-            imgPreviewLeft.setRotation(90);
-        }else if(pictureId == 4){
-            File imgFileTop = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_1.png");
-            Bitmap imgTop = BitmapFactory.decodeFile(imgFileTop.getAbsolutePath());
-            File imgFileRight = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_5.png");
-            Bitmap imgRight = BitmapFactory.decodeFile(imgFileRight.getAbsolutePath());
-
-            imgPreviewTop.setImageBitmap(imgTop);
-            imgPreviewTop.setRotation(90);
-            imgPreviewRight.setImageBitmap(imgRight);
-        }
+//        if(pictureId == 1){
+//            File myFile2 = new File(picture2Path);
+//            if(myFile2.exists()){
+//                Bitmap imgRight = downScaleImage(picture2Path);
+//
+//                imgPreviewBottom.setImageBitmap(imgRight);
+//                imgPreviewBottom.setRotation(90);
+//            }
+//        }else if(pictureId == 2){
+//            File myFile1 = new File(picture1Path);
+//            if(myFile1.exists()){
+//                Bitmap imgLeft = downScaleImage(picture1Path);
+//
+//                imgPreviewTop.setImageBitmap(imgLeft);
+//                imgPreviewTop.setRotation(90);
+//            }
+//            File myFile3 = new File(picture3Path);
+//            if(myFile3.exists()){
+//                Bitmap imgRight = downScaleImage(picture3Path);
+//
+//                imgPreviewBottom.setImageBitmap(imgRight);
+//                imgPreviewBottom.setRotation(90);
+//            }
+//        }else if(pictureId == 3){
+//            File myFile2 = new File(picture2Path);
+//            if(myFile2.exists()){
+//                Bitmap imgLeft = downScaleImage(picture2Path);
+//
+//                imgPreviewTop.setImageBitmap(imgLeft);
+//                imgPreviewTop.setRotation(90);
+//            }
+//        }else if(pictureId == 4){
+//            File myFile1 = new File(picture1Path);
+//            if(myFile1.exists()){
+//                Bitmap imgTop = downScaleImage(picture1Path);
+//
+//                imgPreviewRight.setImageBitmap(imgTop);
+//                imgPreviewRight.setRotation(90);
+//            }
+//            File myFile5 = new File(picture5Path);
+//            if(myFile5.exists()){
+//                Bitmap imgRight= downScaleImage(picture5Path);
+//
+//                imgPreviewBottom.setImageBitmap(imgRight);
+//                imgPreviewBottom.setRotation(90);
+//            }
+//        }
+//        else if(pictureId == 5){
+//            File myFile3 = new File(picture3Path);
+//            if(myFile3.exists()){
+//                Bitmap imgTop = downScaleImage(picture3Path);
+//
+//                imgPreviewRight.setImageBitmap(imgTop);
+//                imgPreviewRight.setRotation(90);
+//            }
+//            File myFile6 = new File(picture6Path);
+//            if(myFile6.exists()){
+//                Bitmap imgRight = downScaleImage(picture6Path);
+//
+//                imgPreviewBottom.setImageBitmap(imgRight);
+//                imgPreviewBottom.setRotation(90);
+//            }
+//            File myFile4 = new File(picture4Path);
+//            if(myFile4.exists()){
+//                Bitmap imgLeft = downScaleImage(picture4Path);
+//
+//                imgPreviewTop.setImageBitmap(imgLeft);
+//                imgPreviewTop.setRotation(90);
+//            }
+//
+//        }
+//        else if(pictureId == 6){
+//            File myFile3 = new File(picture3Path);
+//            if(myFile3.exists()){
+//                Bitmap imgTop = downScaleImage(picture3Path);
+//
+//                imgPreviewRight.setImageBitmap(imgTop);
+//                imgPreviewRight.setRotation(90);
+//            }
+//            File myFile5 = new File(picture5Path);
+//            if(myFile5.exists()){
+//                Bitmap imgRight = downScaleImage(picture5Path);
+//
+//                imgPreviewTop.setImageBitmap(imgRight);
+//                imgPreviewTop.setRotation(90);
+//            }
+//        }
     }
 
     private void startCamera() {
@@ -228,6 +290,25 @@ public class CameraActivity extends AppCompatActivity {
             }
         }
         return true;
+    }
+
+    Bitmap downScaleImage(String path){
+        File file = new File(path);
+        Bitmap im = BitmapFactory.decodeFile(file.getAbsolutePath());
+
+        final int maxSize = 960;
+        int outWidth; int outHeight;
+        int inWidth = im.getWidth(); int inHeight = im.getHeight();
+        if(inWidth > inHeight){
+            outWidth = maxSize;
+            outHeight = (inHeight * maxSize) / inWidth;
+        } else {
+            outHeight = maxSize;
+            outWidth = (inWidth * maxSize) / inHeight;
+        }
+
+        Bitmap imCompress = Bitmap.createScaledBitmap(im, outWidth, outHeight, false);
+        return imCompress;
     }
 
     public void back(View view) {

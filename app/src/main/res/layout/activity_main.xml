@@ -10,24 +10,20 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/stitchHorizontal"
-        android:text="Stitch Images Horizontally"
-        android:onClick="stitchHorizontal"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/stitchVertical"
-        android:text="Stitch Images Vertically"
-        android:onClick="stitchVectical"/>
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/getPicure"
-        android:text="Get Picture"
+        android:text="Mulai Ambil Foto"
         android:onClick="getPicture"/>
-    <ImageView
+<!--    <ImageView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:id="@+id/opencvImg"/>-->
+
+    <com.github.chrisbanes.photoview.PhotoView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/opencvImg"/>
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:scaleType="centerInside" />
 
 </LinearLayout>

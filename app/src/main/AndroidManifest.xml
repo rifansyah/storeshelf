@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.android.storeshelf">
+    package="com.android.storeshelfdemo">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -13,11 +13,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:largeHeap="true">
-        <activity android:name="com.android.storeshelf.CameraActivity"
+        <activity android:name="com.android.storeshelfdemo.CameraActivity"
             android:screenOrientation="portrait"></activity>
-        <activity android:name="com.android.storeshelf.GetPicture"
-            android:screenOrientation="portrait"/>
-        <activity android:name="com.android.storeshelf.MainActivity">
+        <activity android:name="com.android.storeshelfdemo.GetPicture"
+            android:screenOrientation="landscape"/>
+        <activity android:name="com.android.storeshelfdemo.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
