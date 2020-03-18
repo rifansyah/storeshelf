@@ -8,76 +8,40 @@
     android:backgroundTint="#00000000"
     tools:context=".CameraActivity">
 
+    <!--Note: This used landscape logic-->
+
     <ImageView
         android:id="@+id/imagePreviewLeft"
-        android:layout_width="64dp"
-        android:layout_height="match_parent"
-        android:layout_marginTop="64dp"
-        android:layout_marginBottom="64dp"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/view_finder"
+        android:elevation="5dp"
+        android:scaleType="fitStart"
+        app:layout_constraintEnd_toStartOf="@+id/imagePreviewRight"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <ImageView
-        android:id="@+id/imagePreviewTop"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginEnd="64dp"
-        android:adjustViewBounds="true"
-        android:foregroundGravity="bottom|center_horizontal"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/imagePreviewLeft"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/imagePreviewBottom"
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginEnd="64dp"
-        android:adjustViewBounds="false"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_finder" />
+        app:layout_constraintTop_toTopOf="@+id/view_finder" />
 
     <ImageView
         android:id="@+id/imagePreviewRight"
-        android:layout_width="64dp"
-        android:layout_height="match_parent"
-        android:layout_marginTop="64dp"
-        android:layout_marginBottom="64dp"
+        android:layout_width="30dp"
+        android:layout_height="0dp"
         android:adjustViewBounds="true"
         android:cropToPadding="false"
         android:foregroundGravity="left|center"
         android:scaleType="fitCenter"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/view_finder"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/view_finder"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/view_finder" />
 
     <TextureView
         android:id="@+id/view_finder"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="64dp"
-        android:layout_marginEnd="64dp"
-        android:layout_marginBottom="64dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintDimensionRatio="3:4"
+        app:layout_constraintEnd_toStartOf="@+id/imagePreviewRight"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/imgCapture"

@@ -4,11 +4,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ClipDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Rational;
 import android.util.Size;
+import android.view.Gravity;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
@@ -41,6 +46,8 @@ public class CameraActivity extends AppCompatActivity {
     private final String[] REQUIRED_PERMISSIONS = new String[]{"android.permission.CAMERA", "android.permission.WRITE_EXTERNAL_STORAGE"};
     TextureView textureView;
 
+    private ImageView imgPreviewLeft;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,10 +66,8 @@ public class CameraActivity extends AppCompatActivity {
         String picture5Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_5.png";
         String picture6Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_6.png";
 
-        ImageView imgPreviewLeft = findViewById(R.id.imagePreviewLeft);
         ImageView imgPreviewRight = findViewById(R.id.imagePreviewRight);
-        ImageView imgPreviewTop = findViewById(R.id.imagePreviewTop);
-        ImageView imgPreviewBottom = findViewById(R.id.imagePreviewBottom);
+        imgPreviewLeft = findViewById(R.id.imagePreviewLeft);
 
         textureView = findViewById(R.id.view_finder);
         ImageButton imgCapture = findViewById(R.id.imgCapture);
@@ -181,16 +186,16 @@ public class CameraActivity extends AppCompatActivity {
 //                imgPreviewTop.setRotation(90);
 //            }
 //        }
+        setPreviousPreviewImage();
     }
 
     private void startCamera() {
 
         CameraX.unbindAll();
 
-        Rational aspectRatio = new Rational (textureView.getWidth(), textureView.getHeight());
-        Size screen = new Size(textureView.getWidth(), textureView.getHeight()); //size of the screen
+        Size screen = new Size(640, 480);
 
-        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(aspectRatio).setTargetResolution(screen).build();
+        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetResolution(screen).build();
         Preview preview = new Preview(pConfig);
 
         preview.setOnPreviewOutputUpdateListener(
@@ -371,5 +376,59 @@ public class CameraActivity extends AppCompatActivity {
         }else if(pictureId == 6){
             finish();
         }
+    }
+
+    public void setPreviousPreviewImage() {
+        int pictureId = getIntent().getIntExtra("pictureNumber",0);
+        String resultFilename;
+        if(pictureId == 2) {
+            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_1.png";
+        } else if(pictureId == 3){
+            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_2.png";
+        } else if(pictureId == 4){
+            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_3.png";
+        } else if(pictureId == 5){
+            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_4.png";
+        } else if(pictureId == 6){
+            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_5.png";
+        } else{
+            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_6.png";
+        }
+//        String resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_0.png";
+
+        File myFile = new File(resultFilename);
+        if(myFile.exists()){
+            Bitmap imgResult = BitmapFactory.decodeFile(myFile.getAbsolutePath());
+
+            int width = imgResult.getWidth();
+            int height = imgResult.getHeight();
+            int newWidth = 300;
+
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+
+            Bitmap newBitmap = Bitmap.createBitmap(imgResult, width - newWidth, 0, newWidth, height, matrix, false);
+
+//            BitmapDrawable bmd = new BitmapDrawable(resizedBitmap);
+//
+//            ImageView imageView = new ImageView(this);
+//
+//            imageView.setImageDrawable(bmd);
+
+            Bitmap semiTransparentBitmap = adjustOpacity(newBitmap, 200);
+
+            imgPreviewLeft.setImageBitmap(semiTransparentBitmap);
+        }
+    }
+
+    private Bitmap adjustOpacity(Bitmap bitmap, int opacity)
+    {
+        Bitmap mutableBitmap = bitmap.isMutable()
+                ? bitmap
+                : bitmap.copy(Bitmap.Config.ARGB_8888, true);
+        Canvas canvas = new Canvas(mutableBitmap);
+        int colour = (opacity & 0xFF) << 24;
+        canvas.drawColor(colour, PorterDuff.Mode.DST_IN);
+        return mutableBitmap;
     }
 }

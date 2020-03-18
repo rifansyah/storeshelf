@@ -27,11 +27,27 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.opencv.android.Utils;
+import org.opencv.calib3d.Calib3d;
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.DMatch;
+import org.opencv.core.KeyPoint;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfDMatch;
+import org.opencv.core.MatOfKeyPoint;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Size;
+import org.opencv.features2d.AKAZE;
+import org.opencv.features2d.DescriptorMatcher;
+import org.opencv.features2d.Features2d;
+import org.opencv.imgproc.Imgproc;
 
 public class GetPicture extends AppCompatActivity {
 
@@ -493,22 +509,131 @@ public class GetPicture extends AppCompatActivity {
         Utils.bitmapToMat(im5Compress, img5);
         Utils.bitmapToMat(im6Compress, img6);
 
-        Bitmap imgBitmapHor1 = stitchImagesHorizontal(Arrays.asList(img1, img2, img3));
-        Bitmap imgBitmapHor2 = stitchImagesHorizontal(Arrays.asList(img4, img5, img6));
+//        Bitmap imgBitmapHor1 = stitchImagesHorizontal(Arrays.asList(img1, img2, img3));
+//        Bitmap imgBitmapHor2 = stitchImagesHorizontal(Arrays.asList(img4, img5, img6));
+        Mat tempTop = stitchTwoImages(img1, img2);
+        Mat resTop = stitchTwoImages(tempTop, img3);
+
+        Mat tempBottom = stitchTwoImages(img4, img5);
+        Mat resBottom = stitchTwoImages(tempBottom, img6);
+
 
         Mat imgHorizontal1 = new Mat();
         Mat imgHorizontal2 = new Mat();
-        Utils.bitmapToMat(imgBitmapHor1, imgHorizontal1);
-        Utils.bitmapToMat(imgBitmapHor2, imgHorizontal2);
+//        Utils.bitmapToMat(imgBitmapHor1, imgHorizontal1);
+//        Utils.bitmapToMat(imgBitmapHor2, imgHorizontal2);
 
-        Bitmap imgBitmap = stitchImagesVertical(Arrays.asList(imgHorizontal1, imgHorizontal2));
+        Bitmap imgBitmap = stitchImagesVertical(Arrays.asList(resTop, resBottom));
 
-//        ImageView imageView = findViewById(R.id.imageView);
-//        imageView.setImageBitmap(imgBitmap);
         saveBitmap(imgBitmap);
 
         finish();
+    }
 
-//        GetPicture.this.closeProcessingDialog();
+    public static Mat stitchTwoImages(Mat img1, Mat img2) {
+        Mat img1Gray = new Mat();
+        Mat img2Gray = new Mat();
+
+        Imgproc.cvtColor(img1, img1Gray, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.cvtColor(img2, img2Gray, Imgproc.COLOR_BGR2GRAY);
+
+        Mat dc1 = new Mat();
+        MatOfKeyPoint kp1 = new MatOfKeyPoint();
+        Mat dc2 = new Mat();
+        MatOfKeyPoint kp2 = new MatOfKeyPoint();
+
+        AKAZE akaze = AKAZE.create();
+        akaze.detectAndCompute(img1Gray, new Mat(), kp1, dc1);
+        akaze.detectAndCompute(img2Gray, new Mat(), kp2, dc2);
+
+        DescriptorMatcher matcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
+        List<MatOfDMatch> knnMatches = new ArrayList<MatOfDMatch>();
+        matcher.knnMatch(dc1, dc2, knnMatches, 2);
+
+        float ratioThreshold = 0.6f;
+        List<DMatch> goodMatches = new ArrayList<DMatch>();
+        for (int i = 0; i < knnMatches.size(); i++) {
+            DMatch[] matches = knnMatches.get(i).toArray();
+            float dist1 = matches[0].distance;
+            float dist2 = matches[1].distance;
+            if (dist1 < ratioThreshold * dist2) {
+                goodMatches.add(matches[0]);
+            }
+        }
+
+        System.out.println(String.valueOf(goodMatches.size()));
+
+        LinkedList<Point> imgPoints1List = new LinkedList<Point>();
+        LinkedList<Point> imgPoints2List = new LinkedList<Point>();
+        List<KeyPoint> keypoints1List = kp1.toList();
+        List<KeyPoint> keypoints2List = kp2.toList();
+
+        for(int i = 0; i< goodMatches.size(); i++) {
+            imgPoints1List.addLast(keypoints1List.get(goodMatches.get(i).queryIdx).pt);
+            imgPoints2List.addLast(keypoints2List.get(goodMatches.get(i).trainIdx).pt);
+        }
+
+        MatOfPoint2f srcPts = new MatOfPoint2f();
+        srcPts.fromList(imgPoints1List);
+        MatOfPoint2f dstPts = new MatOfPoint2f();
+        dstPts.fromList(imgPoints2List);
+
+        Mat H = Calib3d.findHomography(srcPts, dstPts, Calib3d.RANSAC, 5);
+
+        int imageWidth = img1.cols();
+        int imageHeight = img1.rows();
+
+        Mat Offset = new Mat(3, 3, H.type());
+        Offset.put(0,0, new double[]{1});
+        Offset.put(0,1, new double[]{0});
+        Offset.put(0,2, new double[]{imageWidth});
+        Offset.put(1,0, new double[]{0});
+        Offset.put(1,1, new double[]{1});
+        Offset.put(1,2, new double[]{imageHeight});
+        Offset.put(2,0, new double[]{0});
+        Offset.put(2,1, new double[]{0});
+        Offset.put(2,2, new double[]{1});
+
+        Core.gemm(Offset, H, 1, new Mat(), 0, H);
+
+        Mat srcCorners = new Mat(4,1, CvType.CV_32FC2);
+        Mat dstCorners = new Mat(4,1, CvType.CV_32FC2);
+
+        srcCorners.put(0,0, new double[]{0,0});
+        srcCorners.put(0,0, new double[]{imageWidth,0});
+        srcCorners.put(0,0,new double[]{imageWidth,imageHeight});
+        srcCorners.put(0,0,new double[]{0,imageHeight});
+
+        Core.perspectiveTransform(srcCorners, dstCorners, H);
+
+        Size s = new Size(imageWidth * 3,imageHeight * 3);
+        Mat imgMatches = new Mat(new Size(img1.cols() + img2.cols(), img1.rows()), CvType.CV_32FC2);
+
+        Imgproc.warpPerspective(img1, imgMatches, H, s);
+
+        int mxPos = (int)(imgMatches.size().width/2 - img2.size().width/2);
+        int myPos = (int)(imgMatches.size().height/2 - img2.size().height/2);
+        Mat m = new Mat(imgMatches,new Rect(mxPos, myPos, img2.cols(), img2.rows()));
+
+        img2.copyTo(m);
+
+        Mat resGray = new Mat();
+        Mat resGrayThreshold = new Mat();
+        Mat hierarchy = new Mat();
+        ArrayList<MatOfPoint> contours = new ArrayList<>();
+        Imgproc.cvtColor(imgMatches, resGray, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.threshold(resGray, resGrayThreshold, 5, 255,Imgproc.THRESH_BINARY);
+        Imgproc.findContours(resGrayThreshold, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        MatOfPoint cnt = contours.get(0);
+        Rect boundingRect = Imgproc.boundingRect(cnt);
+        System.out.println(boundingRect.toString());
+        Mat regionOfInterest = imgMatches.submat(boundingRect);
+
+        MatOfDMatch gm = new MatOfDMatch();
+        gm.fromList(goodMatches);
+        Mat outMat = new Mat();
+        Features2d.drawMatches(img1, kp1, img2, kp2, gm, outMat);
+        return regionOfInterest;
     }
 }

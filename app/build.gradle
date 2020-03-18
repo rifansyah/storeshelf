@@ -26,9 +26,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     testImplementation 'junit:junit:4.12'
-    implementation project(path: ':OpenCV41')
     def cameraxVersion = "1.0.0-alpha02"
     implementation "androidx.camera:camera-core:${cameraxVersion}"
     implementation "androidx.camera:camera-camera2:${cameraxVersion}"
     implementation "com.github.chrisbanes:PhotoView:2.3.0"
+    implementation 'com.quickbirdstudios:opencv:4.1.0-contrib'
 }
