@@ -563,12 +563,20 @@ public class GetPicture extends AppCompatActivity {
 
         System.out.println(String.valueOf(goodMatches.size()));
 
+        if (goodMatches.size() > 50) {
+            return wrapToImages(img1, img2, goodMatches, kp1, kp2);
+        } else {
+            return mergeTwoImagesManually(img1, img2);
+        }
+    }
+
+    public static Mat wrapToImages(Mat img1, Mat img2, List<DMatch> goodMatches, MatOfKeyPoint kp1, MatOfKeyPoint kp2) {
         LinkedList<Point> imgPoints1List = new LinkedList<Point>();
         LinkedList<Point> imgPoints2List = new LinkedList<Point>();
         List<KeyPoint> keypoints1List = kp1.toList();
         List<KeyPoint> keypoints2List = kp2.toList();
 
-        for(int i = 0; i< goodMatches.size(); i++) {
+        for(int i = 0; i < goodMatches.size(); i++) {
             imgPoints1List.addLast(keypoints1List.get(goodMatches.get(i).queryIdx).pt);
             imgPoints2List.addLast(keypoints2List.get(goodMatches.get(i).trainIdx).pt);
         }
@@ -635,5 +643,12 @@ public class GetPicture extends AppCompatActivity {
         Mat outMat = new Mat();
         Features2d.drawMatches(img1, kp1, img2, kp2, gm, outMat);
         return regionOfInterest;
+    }
+
+    public static Mat mergeTwoImagesManually(Mat img1, Mat img2) {
+        Mat m = new Mat(img2,new Rect(img2.cols() / 3, 0, img2.cols() - (img2.cols() / 3), img2.rows()));
+        Mat concat = new Mat();
+        Core.hconcat(Arrays.asList(img1, m), concat);
+        return concat;
     }
 }

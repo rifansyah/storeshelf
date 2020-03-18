@@ -11,6 +11,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ClipDrawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Rational;
 import android.util.Size;
 import android.view.Gravity;
@@ -18,6 +20,7 @@ import android.view.Surface;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -33,6 +36,7 @@ import androidx.camera.core.ImageCapture;
 import androidx.camera.core.ImageCaptureConfig;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
@@ -47,6 +51,7 @@ public class CameraActivity extends AppCompatActivity {
     TextureView textureView;
 
     private ImageView imgPreviewLeft;
+    private ImageView imgPreviewTop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +71,7 @@ public class CameraActivity extends AppCompatActivity {
         String picture5Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_5.png";
         String picture6Path = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_6.png";
 
-        ImageView imgPreviewRight = findViewById(R.id.imagePreviewRight);
+        imgPreviewTop = findViewById(R.id.imagePreviewTop);
         imgPreviewLeft = findViewById(R.id.imagePreviewLeft);
 
         textureView = findViewById(R.id.view_finder);
@@ -186,8 +191,16 @@ public class CameraActivity extends AppCompatActivity {
 //                imgPreviewTop.setRotation(90);
 //            }
 //        }
-        setPreviousPreviewImage();
+        textureView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                textureView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                setLeftPreviousPreviewImage();
+                setTopPreviousPreviewImage();
+            }
+        });
     }
+
 
     private void startCamera() {
 
@@ -195,7 +208,7 @@ public class CameraActivity extends AppCompatActivity {
 
         Size screen = new Size(640, 480);
 
-        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetResolution(screen).build();
+        PreviewConfig pConfig = new PreviewConfig.Builder().setTargetAspectRatio(new Rational(3, 4)).setTargetResolution(screen).build();
         Preview preview = new Preview(pConfig);
 
         preview.setOnPreviewOutputUpdateListener(
@@ -213,8 +226,8 @@ public class CameraActivity extends AppCompatActivity {
                 });
 
 
-        ImageCaptureConfig imageCaptureConfig = new ImageCaptureConfig.Builder().setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
-                .setTargetRotation(getWindowManager().getDefaultDisplay().getRotation()).build();
+        ImageCaptureConfig imageCaptureConfig = new ImageCaptureConfig.Builder().setTargetRotation(Surface.ROTATION_90).setTargetAspectRatio(new Rational(4, 3 )).setCaptureMode(ImageCapture.CaptureMode.MIN_LATENCY)
+                .build();
         final ImageCapture imgCap = new ImageCapture(imageCaptureConfig);
 
         findViewById(R.id.imgCapture).setOnClickListener(new View.OnClickListener() {
@@ -378,23 +391,20 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    public void setPreviousPreviewImage() {
+    public void setLeftPreviousPreviewImage() {
         int pictureId = getIntent().getIntExtra("pictureNumber",0);
         String resultFilename;
         if(pictureId == 2) {
             resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_1.png";
         } else if(pictureId == 3){
             resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_2.png";
-        } else if(pictureId == 4){
-            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_3.png";
         } else if(pictureId == 5){
             resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_4.png";
         } else if(pictureId == 6){
             resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_5.png";
         } else{
-            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_6.png";
+            return;
         }
-//        String resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_0.png";
 
         File myFile = new File(resultFilename);
         if(myFile.exists()){
@@ -402,22 +412,44 @@ public class CameraActivity extends AppCompatActivity {
 
             int width = imgResult.getWidth();
             int height = imgResult.getHeight();
-            int newWidth = 300;
+            int newWidth = (int) Math.floor(width * 0.3333333);
 
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
 
             Bitmap newBitmap = Bitmap.createBitmap(imgResult, width - newWidth, 0, newWidth, height, matrix, false);
-
-//            BitmapDrawable bmd = new BitmapDrawable(resizedBitmap);
-//
-//            ImageView imageView = new ImageView(this);
-//
-//            imageView.setImageDrawable(bmd);
-
-            Bitmap semiTransparentBitmap = adjustOpacity(newBitmap, 200);
+            Bitmap semiTransparentBitmap = adjustOpacity(newBitmap, 230);
 
             imgPreviewLeft.setImageBitmap(semiTransparentBitmap);
+        }
+    }
+
+    public void setTopPreviousPreviewImage() {
+        int pictureId = getIntent().getIntExtra("pictureNumber",0);
+        String resultFilename;
+         if(pictureId == 4){
+            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_1.png";
+        } else if(pictureId == 5){
+            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_2.png";
+        } else if(pictureId == 6){
+            resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/" + "CapturedImage" + "_3.png";
+        } else{
+            return;
+        }
+
+        File myFile = new File(resultFilename);
+        if(myFile.exists()){
+            Bitmap imgResult = BitmapFactory.decodeFile(myFile.getAbsolutePath());
+
+            int width = imgResult.getWidth();
+            int height = imgResult.getHeight();
+
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+
+            Bitmap bottomOfBitmap = Bitmap.createBitmap(imgResult, 0, height - 100, width, 100, matrix, false);
+
+            imgPreviewTop.setImageBitmap(bottomOfBitmap);
         }
     }
 
