@@ -22,9 +22,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (!OpenCVLoader.initDebug()) {
-            Toast.makeText(this, "ga bisa", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "bisa", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Gagal mengaktifkan opencv. Coba lagi", Toast.LENGTH_LONG).show();
         }
 
         String resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/StoreShelfDemoResult.bmp";
