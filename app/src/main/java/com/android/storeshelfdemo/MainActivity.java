@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import org.opencv.android.OpenCVLoader;
+//import org.opencv.android.OpenCVLoader;
 import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,9 +21,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (!OpenCVLoader.initDebug()) {
-            Toast.makeText(this, "Gagal mengaktifkan opencv. Coba lagi", Toast.LENGTH_LONG).show();
-        }
+//        if (!OpenCVLoader.initDebug()) {
+//            Toast.makeText(this, "Gagal mengaktifkan opencv. Coba lagi", Toast.LENGTH_LONG).show();
+//        }
 
         String resultFilename = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/StoreShelfDemoResult.bmp";
 
